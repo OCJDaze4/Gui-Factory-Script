@@ -4,7 +4,6 @@ local doit = false
 local plr = game.Players.LocalPlayer
 local gui = plr.PlayerGui["3"].MainFrame.LuckShop
 gui.LocalScript:Destroy()
-print("work?")
 
 uis.TextBoxFocused:Connect(function()
     able = false
