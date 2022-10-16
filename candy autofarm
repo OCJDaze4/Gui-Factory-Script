@@ -1,0 +1,37 @@
+local uis = game:GetService("UserInputService")
+local able = true
+local doit = false
+local plr = game.Players.LocalPlayer
+local hrp = plr.Character.HumanoidRootPart
+
+game.StarterGui:SetCore("SendNotification", {Title = "Direction"; Text = "Press E to start and stop candy corn gain."; Duration = "10"; Button1 = "Ok shut up"; })
+
+uis.TextBoxFocused:Connect(function()
+    able = false
+end)
+uis.TextBoxFocusReleased:Connect(function()
+    able = true
+end)
+
+uis.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.E and able then
+        if not doit then
+            doit = true
+        else
+            doit = false
+        end
+    end
+end)
+
+while wait() do
+    wait(4)
+    if doit then
+        for i, v in pairs(game:GetService("Workspace"):GetChildren()) do
+            if(v.Name == "CandyCorn" and v.Parent) then
+                firetouchinterest(hrp, v, 0)
+                wait(0.1)
+                firetouchinterest(hrp, v, 1)
+            end
+        end
+    end
+end
