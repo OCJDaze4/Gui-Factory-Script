@@ -4,7 +4,6 @@ local doit = false
 local plr = game.Players.LocalPlayer
 local gui = plr.PlayerGui["3"].MainFrame.LuckShop
 gui.LocalScript:Destroy()
-game.StarterGui:SetCore("SendNotification", {Title = "Directions"; Text = "Press E to open and close the GUI."})
 
 uis.TextBoxFocused:Connect(function()
     able = false
