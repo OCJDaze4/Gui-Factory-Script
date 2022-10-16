@@ -1,0 +1,32 @@
+local uis = game:GetService("UserInputService")
+local able = true
+local doit = false
+local plr = game.Players.LocalPlayer
+local gui = plr.PlayerGui["3"].MainFrame.LuckShop
+gui.LocalScript:Destroy()
+
+uis.TextBoxFocused:Connect(function()
+    able = false
+end)
+uis.TextBoxFocusReleased:Connect(function()
+    able = true
+end)
+
+uis.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.E and able then
+        if not doit then
+            doit = true
+        else
+            doit = false
+        end
+    end
+end)
+
+while wait() do
+    wait(0.1)
+    if doit then
+        gui.Visible = true
+    else
+        gui.Visible = false
+    end
+end
