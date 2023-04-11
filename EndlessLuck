@@ -1,0 +1,7 @@
+local thing = workspace.Part6
+local hrp = game.Players.LocalPlayer.Character.HumanoidRootPart
+
+while wait(0.1) do
+    firetouchinterest(thing, hrp, 1)
+    firetouchinterest(thing, hrp, 0)
+end
