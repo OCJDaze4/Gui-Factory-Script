@@ -1,0 +1,135 @@
+--[[
+
+UMG SCRIPT!!!!!!!!! woohoo 
+
+--]]
+local plr = game.Players.LocalPlayer
+local pickaxe = plr.Backpack:FindFirstChild("Pickaxe")
+if not pickaxe then
+	pickaxe = plr.Character:FindFirstChild("Pickaxe")
+end
+local ranBefore = true
+if pickaxe:FindFirstChild("Client") then
+	pickaxe.Client:Destroy()
+	ranBefore = false
+end
+
+local getRarity = function(ore, modifier)
+	local ores = game:GetService("ReplicatedStorage").Ores:WaitForChild(ore)
+	local multipliers = {
+	["Altered"] = {110, 100, 90, 80, 70, 60, 50, 40, 30, 20, 15, 35},
+	["Super Altered"] = {550, 500, 450, 400, 350, 300, 250, 200, 150, 100, 50, 175},
+	["Gigantic"] = {1650, 1500, 1350, 1200, 1050, 900, 750, 600, 450, 300, 150, 525},
+	["Tiny"] = {2200, 2000, 1800, 1600, 1400, 1200, 1000, 800, 600, 400, 200, 700},
+	["EVIL"] = {6666, 5555, 4444, 3333, 2222, 1666, 1333, 1000, 777, 666, 444, 850}
+	}
+	local tiers = {"Common", "Uncommon", "Rare", "Ultra Rare", "Unique", "Legendary", "Exotic", "Supernatural", "Otherworldly", "Dinglebob", "Fingulated", "Speicial"}
+	if ores and ores:FindFirstChild("SpecialRarity") then
+		local tierNum = table.find(tiers, ores:FindFirstChild("Rarity").Value)
+		if modifier then
+			return ores.SpecialRarity.Value * multipliers[modifier][tierNum]
+		end
+		return ores.SpecialRarity.Value
+	end
+end
+
+workspace.Debris.ChildAdded:Connect(function(debris)
+	if debris:IsA("Part") then
+		debris.CanQuery = false
+	end
+end)
+
+local neededFound = 0
+workspace.Mine.ChildAdded:Connect(function(ore)
+	wait(0.3)
+	if ore then
+		local modifier = nil
+		if ore:FindFirstChild("Altered") then
+			modifier = "Altered"
+		elseif ore:FindFirstChild("Super Altered") then
+			modifier = "Super Altered"
+		elseif ore:FindFirstChild("Gigantic") then
+			modifier = "Gigantic"
+		elseif ore:FindFirstChild("Tiny") then
+			modifier = "Tiny"
+		elseif ore:FindFirstChild("EVIL") then
+			modifier = "EVIL"
+		end
+		local spra = ore:FindFirstChild("SpecialRarity")
+		if not ore:FindFirstChild("SpecialRarity") then
+			spra = Instance.new("IntValue")
+			spra.Parent = ore
+			spra.Name = "SpecialRarity"
+		end
+			spra.Value = getRarity(ore.Name, modifier)
+		if ore:WaitForChild("SpecialRarity").Value >= 1000 and pickaxe.Parent == plr.Character then
+			local plrDepth = plr.Character.HumanoidRootPart.Position.Y
+			local pls = neededFound - 1
+			if neededFound <= 0 then
+				pls = 0
+			end
+			if plrDepth + 50 >= ore.Position.Y and plrDepth - 50 <= ore.Position.Y then
+				while neededFound > pls do
+					wait(0.1)
+				end
+				neededFound += 1
+				pickaxe:WaitForChild("ApplyTarget"):InvokeServer(ore)
+				while ore.Parent == "Mine" do
+					wait(0.1)
+				end
+				neededFound -= 1
+			end
+		end
+	end
+end)
+
+local mouse = plr:GetMouse()
+local heldDown = false
+mouse.Button1Down:Connect(function()
+	heldDown = true
+	pickaxe:WaitForChild("Activation"):FireServer(true)
+end)
+
+mouse.Button1Up:Connect(function()
+	heldDown = false
+	pickaxe:WaitForChild("Activation"):FireServer(false)
+end)
+
+local mouse = game:GetService("Players").LocalPlayer:GetMouse()
+local mainGui = plr.PlayerGui.MainGui
+local oreGui = mainGui.SelectedOre.OreName
+local rarityGui = mainGui.SelectedRarity.OreRarity
+
+game:GetService("RunService").RenderStepped:Connect(function(unix)
+	local ore = mouse.Target
+	oreGui.Visible = false
+	oreGui.Parent.Visible = false
+	rarityGui.Visible = false
+	rarityGui.Parent.Visible = false
+	mainGui.SelectedOwnership.Visible = false
+	mainGui.SelectedOwnership.OreOwnership.Visible = false
+	if ore then
+		if ore.Parent.Name == "Mine" then
+			oreGui.Text = ore.Name
+			oreGui.Parent.Visible = true
+			oreGui.Visible = true
+			if ore:FindFirstChild("SpecialRarity") then
+				local rarity = ore.SpecialRarity.Value
+				rarityGui.Text = "1/" .. tostring(ore.SpecialRarity.Value) .. ". Tier: idk"
+				rarityGui.Parent.Visible = true
+				rarityGui.Visible = true
+			else
+				rarityGui.Text = "1/1. Tier: Layers."
+				rarityGui.Parent.Visible = true
+				rarityGui.Visible = true
+			end
+		end
+	end
+	if heldDown and neededFound <= 0 then
+		if ore and pickaxe.Parent then
+			if ore.Parent.Name == "Mine" and pickaxe.Parent == plr.Character then
+				pickaxe:WaitForChild("ApplyTarget"):InvokeServer(ore)
+			end
+		end
+	end
+end)
